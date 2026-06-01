@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const commentRoutes = require(
+  "./routes/commentRoutes"
+);
 
 const articleRoutes = require("./routes/articleRoutes");
 
@@ -45,8 +48,10 @@ app.use("/api/auth", authRoutes);
  * Article routes
  */
 app.use("/api/articles", articleRoutes);
-
+app.use("/api/articles", commentRoutes);
 /**
  * Export configured Express application
  */
+
+
 module.exports = app;

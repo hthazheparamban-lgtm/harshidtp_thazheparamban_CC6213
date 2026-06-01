@@ -1,5 +1,6 @@
 const Article = require("../models/Article");
 const redisClient = require("../config/redis");
+
 /**
  * Create new article
  */
@@ -25,21 +26,27 @@ const createArticle = async (req, res) => {
       author: req.user._id
     });
 
+    /**
+     * Clear cached article list
+     */
+    await redisClient.del("articles");
+
     return res.status(201).json({
       success: true,
       article
     });
 
-  }  catch (error) {
+  } catch (error) {
 
-  console.log(error);
+    console.log(error);
 
-  return res.status(500).json({
-    success: false,
-    message: error.message
-  });
-}
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
+
 /**
  * Get all articles
  */
@@ -63,7 +70,7 @@ const getArticles = async (req, res) => {
     }
 
     /**
-     * Fetch from MongoDB
+     * Fetch articles from MongoDB
      */
     const articles = await Article.find()
       .populate("author", "username email");
@@ -102,6 +109,27 @@ const getSingleArticle = async (req, res) => {
 
   try {
 
+    const cacheKey =
+      `article:${req.params.slug}`;
+
+    /**
+     * Check Redis cache first
+     */
+    const cachedArticle =
+      await redisClient.get(cacheKey);
+
+    if (cachedArticle) {
+
+      return res.status(200).json({
+        success: true,
+        source: "redis-cache",
+        article: JSON.parse(cachedArticle)
+      });
+    }
+
+    /**
+     * Fetch article from MongoDB
+     */
     const article = await Article.findOne({
       slug: req.params.slug
     }).populate("author", "username email");
@@ -113,12 +141,21 @@ const getSingleArticle = async (req, res) => {
         message: "Article not found"
       });
     }
-/**
- * Clear cached article list
- */
-await redisClient.del("articles");
+
+    /**
+     * Store article in Redis cache
+     */
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(article),
+      {
+        EX: 60
+      }
+    );
+
     return res.status(200).json({
       success: true,
+      source: "mongodb",
       article
     });
 
@@ -130,6 +167,7 @@ await redisClient.del("articles");
     });
   }
 };
+
 /**
  * Update article
  */
@@ -176,6 +214,15 @@ const updateArticle = async (req, res) => {
         }
       );
 
+    /**
+     * Clear Redis cache
+     */
+    await redisClient.del("articles");
+
+    await redisClient.del(
+      `article:${req.params.slug}`
+    );
+
     return res.status(200).json({
       success: true,
       article: updatedArticle
@@ -189,6 +236,7 @@ const updateArticle = async (req, res) => {
     });
   }
 };
+
 /**
  * Delete article
  */
@@ -223,6 +271,15 @@ const deleteArticle = async (req, res) => {
     }
 
     await article.deleteOne();
+
+    /**
+     * Clear Redis cache
+     */
+    await redisClient.del("articles");
+
+    await redisClient.del(
+      `article:${req.params.slug}`
+    );
 
     return res.status(200).json({
       success: true,
