@@ -1,5 +1,5 @@
 const Article = require("../models/Article");
-
+const redisClient = require("../config/redis");
 /**
  * Create new article
  */
@@ -47,11 +47,41 @@ const getArticles = async (req, res) => {
 
   try {
 
+    /**
+     * Check Redis cache first
+     */
+    const cachedArticles =
+      await redisClient.get("articles");
+
+    if (cachedArticles) {
+
+      return res.status(200).json({
+        success: true,
+        source: "redis-cache",
+        articles: JSON.parse(cachedArticles)
+      });
+    }
+
+    /**
+     * Fetch from MongoDB
+     */
     const articles = await Article.find()
       .populate("author", "username email");
 
+    /**
+     * Store articles in Redis cache
+     */
+    await redisClient.set(
+      "articles",
+      JSON.stringify(articles),
+      {
+        EX: 60
+      }
+    );
+
     return res.status(200).json({
       success: true,
+      source: "mongodb",
       count: articles.length,
       articles
     });
@@ -83,7 +113,10 @@ const getSingleArticle = async (req, res) => {
         message: "Article not found"
       });
     }
-
+/**
+ * Clear cached article list
+ */
+await redisClient.del("articles");
     return res.status(200).json({
       success: true,
       article
