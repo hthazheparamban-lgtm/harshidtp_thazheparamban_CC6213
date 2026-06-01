@@ -3,8 +3,8 @@ const { validationResult } = require("express-validator");
 /**
  * Validation middleware
  * 
- * Checks request validation results
- * and returns errors if validation fails.
+ * Checks validation results from
+ * express-validator rules.
  */
 const validate = (req, res, next) => {
 
@@ -18,6 +18,7 @@ const validate = (req, res, next) => {
     });
   }
 
+  // Continue to next middleware/controller
   next();
 };
 
