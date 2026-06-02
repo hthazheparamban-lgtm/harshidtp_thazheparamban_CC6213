@@ -1,5 +1,6 @@
 const express = require("express");
 
+// Import comment controller methods
 const {
   addComment,
   getComments,
@@ -8,32 +9,27 @@ const {
   "../controllers/commentController"
 );
 
+// Import authentication middleware
 const protect = require(
   "../middleware/authMiddleware"
 );
 
 const router = express.Router();
 
-/**
- * Add comment
- */
+// Add comment to article
 router.post(
   "/:slug/comments",
   protect,
   addComment
 );
 
-/**
- * Get article comments
- */
+// Get article comments
 router.get(
   "/:slug/comments",
   getComments
 );
 
-/**
- * Delete comment
- */
+// Delete comment
 router.delete(
   "/comments/:id",
   protect,

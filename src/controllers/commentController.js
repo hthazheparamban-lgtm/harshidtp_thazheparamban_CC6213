@@ -1,13 +1,12 @@
 const Comment = require("../models/Comment");
 const Article = require("../models/Article");
 
-/**
- * Add comment to article
- */
+// Add comment to article
 const addComment = async (req, res) => {
 
   try {
 
+    // Find article by slug
     const article = await Article.findOne({
       slug: req.params.slug
     });
@@ -20,6 +19,7 @@ const addComment = async (req, res) => {
       });
     }
 
+    // Create new comment
     const comment = await Comment.create({
 
       body: req.body.body,
@@ -43,13 +43,12 @@ const addComment = async (req, res) => {
   }
 };
 
-/**
- * Get article comments
- */
+// Get article comments
 const getComments = async (req, res) => {
 
   try {
 
+    // Find article by slug
     const article = await Article.findOne({
       slug: req.params.slug
     });
@@ -62,6 +61,7 @@ const getComments = async (req, res) => {
       });
     }
 
+    // Retrieve comments for article
     const comments = await Comment.find({
       article: article._id
     }).populate(
@@ -84,13 +84,12 @@ const getComments = async (req, res) => {
   }
 };
 
-/**
- * Delete comment
- */
+// Delete comment
 const deleteComment = async (req, res) => {
 
   try {
 
+    // Find comment by ID
     const comment = await Comment.findById(
       req.params.id
     );
@@ -103,9 +102,7 @@ const deleteComment = async (req, res) => {
       });
     }
 
-    /**
-     * Ownership check
-     */
+    // Verify comment ownership
     if (
       comment.author.toString() !==
       req.user._id.toString()
@@ -117,6 +114,7 @@ const deleteComment = async (req, res) => {
       });
     }
 
+    // Delete comment
     await comment.deleteOne();
 
     return res.status(200).json({

@@ -1,11 +1,7 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 
-/**
- * Article schema
- * 
- * Stores article content and metadata.
- */
+// Article schema
 const articleSchema = new mongoose.Schema(
   {
 
@@ -36,9 +32,7 @@ const articleSchema = new mongoose.Schema(
       }
     ],
 
-    /**
-     * Reference to article author
-     */
+    // Reference to article author
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -50,10 +44,7 @@ const articleSchema = new mongoose.Schema(
   }
 );
 
-/**
- * Automatically generate URL-friendly slug
- * from article title before saving.
- */
+// Generate article slug before saving
 articleSchema.pre("save", function () {
 
   if (!this.slug) {

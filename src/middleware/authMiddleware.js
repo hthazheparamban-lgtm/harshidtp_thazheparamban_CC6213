@@ -1,31 +1,19 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-/**
- * Authentication middleware
- * 
- * Protects private routes by verifying JWT tokens.
- * 
- * Workflow:
- * - Extract token from Authorization header
- * - Verify token authenticity
- * - Decode user ID from token payload
- * - Retrieve authenticated user from database
- * - Attach user object to request
- */
+// Protect private routes using JWT authentication
 const protect = async (req, res, next) => {
   try {
 
     let token;
 
-    // Check if Authorization header exists
-    // and starts with Bearer token
+    // Check for Bearer token in Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
 
-      // Extract JWT token from header
+      // Extract token from header
       token = req.headers.authorization.split(" ")[1];
 
       // Verify and decode JWT token
@@ -34,16 +22,16 @@ const protect = async (req, res, next) => {
         process.env.JWT_SECRET
       );
 
-      // Find authenticated user in database
-      // Exclude password field for security
-      req.user = await User.findById(decoded.id)
-        .select("-password");
+      // Retrieve authenticated user
+      req.user = await User.findById(
+        decoded.id
+      ).select("-password");
 
-      // Continue to next middleware/controller
+      // Continue to next middleware
       return next();
     }
 
-    // Reject requests without valid token
+    // Reject unauthenticated requests
     return res.status(401).json({
       success: false,
       message: "Not authorized"
@@ -51,7 +39,7 @@ const protect = async (req, res, next) => {
 
   } catch (error) {
 
-    // Handle invalid or expired token errors
+    // Handle invalid or expired tokens
     return res.status(401).json({
       success: false,
       message: "Token failed"
