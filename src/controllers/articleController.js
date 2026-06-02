@@ -1,6 +1,10 @@
 const Article = require("../models/Article");
 const redisClient = require("../config/redis");
-
+const {
+  publishArticleCreated
+} = require(
+  "../utils/articlePublisher"
+);
 /**
  * Create new article
  */
@@ -30,6 +34,9 @@ const createArticle = async (req, res) => {
      * Clear cached article list
      */
     await redisClient.del("articles");
+    await publishArticleCreated(
+  article
+);
 
     return res.status(201).json({
       success: true,
