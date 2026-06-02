@@ -5,6 +5,8 @@ const morgan = require("morgan");
 const commentRoutes = require(
   "./routes/commentRoutes"
 );
+const profileRoutes =
+  require("./routes/profileRoutes");
 
 const articleRoutes = require("./routes/articleRoutes");
 
@@ -49,6 +51,10 @@ app.use("/api/auth", authRoutes);
  */
 app.use("/api/articles", articleRoutes);
 app.use("/api/articles", commentRoutes);
+app.use(
+  "/api/profiles",
+  profileRoutes
+);
 /**
  * Export configured Express application
  */
