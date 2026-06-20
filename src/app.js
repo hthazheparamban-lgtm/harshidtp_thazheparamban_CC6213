@@ -4,21 +4,16 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 // Comment routes
-const commentRoutes = require(
-  "./routes/commentRoutes"
-);
-const profileRoutes =
-  require("./routes/profileRoutes");
+const commentRoutes = require("./routes/commentRoutes");
+
+// Profile routes
+const profileRoutes = require("./routes/profileRoutes");
 
 // Article routes
-const articleRoutes = require(
-  "./routes/articleRoutes"
-);
+const articleRoutes = require("./routes/articleRoutes");
 
 // Authentication routes
-const authRoutes = require(
-  "./routes/authRoutes"
-);
+const authRoutes = require("./routes/authRoutes");
 
 // Create Express application
 const app = express();
@@ -48,20 +43,12 @@ app.use("/api/auth", authRoutes);
 
 // Article endpoints
 app.use("/api/articles", articleRoutes);
- develop
-
-app.use("/api/articles", commentRoutes);
-app.use(
-  "/api/profiles",
-  profileRoutes
-);
-/**
- * Export configured Express application
- */
-main
 
 // Comment endpoints
 app.use("/api/articles", commentRoutes);
+
+// Profile endpoints
+app.use("/api/profiles", profileRoutes);
 
 // Export Express app
 module.exports = app;
