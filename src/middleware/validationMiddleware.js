@@ -1,11 +1,6 @@
 const { validationResult } = require("express-validator");
 
-/**
- * Validation middleware
- * 
- * Checks validation results from
- * express-validator rules.
- */
+// Handle request validation errors
 const validate = (req, res, next) => {
 
   const errors = validationResult(req);

@@ -1,13 +1,13 @@
 const Article = require("../models/Article");
 const redisClient = require("../config/redis");
+
 const {
   publishArticleCreated
 } = require(
   "../utils/articlePublisher"
 );
-/**
- * Create new article
- */
+
+// Create new article
 const createArticle = async (req, res) => {
 
   try {
@@ -30,13 +30,13 @@ const createArticle = async (req, res) => {
       author: req.user._id
     });
 
-    /**
-     * Clear cached article list
-     */
+    // Clear cached article list
     await redisClient.del("articles");
+
+    // Publish article creation event
     await publishArticleCreated(
-  article
-);
+      article
+    );
 
     return res.status(201).json({
       success: true,
@@ -54,16 +54,12 @@ const createArticle = async (req, res) => {
   }
 };
 
-/**
- * Get all articles
- */
+// Get all articles
 const getArticles = async (req, res) => {
 
   try {
 
-    /**
-     * Check Redis cache first
-     */
+    // Check Redis cache first
     const cachedArticles =
       await redisClient.get("articles");
 
@@ -72,19 +68,20 @@ const getArticles = async (req, res) => {
       return res.status(200).json({
         success: true,
         source: "redis-cache",
-        articles: JSON.parse(cachedArticles)
+        articles: JSON.parse(
+          cachedArticles
+        )
       });
     }
 
-    /**
-     * Fetch articles from MongoDB
-     */
+    // Fetch articles from MongoDB
     const articles = await Article.find()
-      .populate("author", "username email");
+      .populate(
+        "author",
+        "username email"
+      );
 
-    /**
-     * Store articles in Redis cache
-     */
+    // Store articles in Redis cache
     await redisClient.set(
       "articles",
       JSON.stringify(articles),
@@ -109,19 +106,18 @@ const getArticles = async (req, res) => {
   }
 };
 
-/**
- * Get single article by slug
- */
-const getSingleArticle = async (req, res) => {
+// Get single article by slug
+const getSingleArticle = async (
+  req,
+  res
+) => {
 
   try {
 
     const cacheKey =
       `article:${req.params.slug}`;
 
-    /**
-     * Check Redis cache first
-     */
+    // Check Redis cache first
     const cachedArticle =
       await redisClient.get(cacheKey);
 
@@ -130,16 +126,19 @@ const getSingleArticle = async (req, res) => {
       return res.status(200).json({
         success: true,
         source: "redis-cache",
-        article: JSON.parse(cachedArticle)
+        article: JSON.parse(
+          cachedArticle
+        )
       });
     }
 
-    /**
-     * Fetch article from MongoDB
-     */
+    // Fetch article from MongoDB
     const article = await Article.findOne({
       slug: req.params.slug
-    }).populate("author", "username email");
+    }).populate(
+      "author",
+      "username email"
+    );
 
     if (!article) {
 
@@ -149,9 +148,7 @@ const getSingleArticle = async (req, res) => {
       });
     }
 
-    /**
-     * Store article in Redis cache
-     */
+    // Store article in Redis cache
     await redisClient.set(
       cacheKey,
       JSON.stringify(article),
@@ -175,10 +172,11 @@ const getSingleArticle = async (req, res) => {
   }
 };
 
-/**
- * Update article
- */
-const updateArticle = async (req, res) => {
+// Update article
+const updateArticle = async (
+  req,
+  res
+) => {
 
   try {
 
@@ -194,9 +192,7 @@ const updateArticle = async (req, res) => {
       });
     }
 
-    /**
-     * Ownership check
-     */
+    // Verify article ownership
     if (
       article.author.toString() !==
       req.user._id.toString()
@@ -221,10 +217,10 @@ const updateArticle = async (req, res) => {
         }
       );
 
-    /**
-     * Clear Redis cache
-     */
-    await redisClient.del("articles");
+    // Clear Redis cache
+    await redisClient.del(
+      "articles"
+    );
 
     await redisClient.del(
       `article:${req.params.slug}`
@@ -244,10 +240,11 @@ const updateArticle = async (req, res) => {
   }
 };
 
-/**
- * Delete article
- */
-const deleteArticle = async (req, res) => {
+// Delete article
+const deleteArticle = async (
+  req,
+  res
+) => {
 
   try {
 
@@ -263,9 +260,7 @@ const deleteArticle = async (req, res) => {
       });
     }
 
-    /**
-     * Ownership check
-     */
+    // Verify article ownership
     if (
       article.author.toString() !==
       req.user._id.toString()
@@ -279,10 +274,10 @@ const deleteArticle = async (req, res) => {
 
     await article.deleteOne();
 
-    /**
-     * Clear Redis cache
-     */
-    await redisClient.del("articles");
+    // Clear Redis cache
+    await redisClient.del(
+      "articles"
+    );
 
     await redisClient.del(
       `article:${req.params.slug}`

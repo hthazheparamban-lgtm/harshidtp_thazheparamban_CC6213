@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
-/**
- * Comment schema
- * 
- * Stores comments linked to articles and users.
- */
+// Comment schema
 const commentSchema = new mongoose.Schema(
   {
 
@@ -14,18 +10,14 @@ const commentSchema = new mongoose.Schema(
       trim: true
     },
 
-    /**
-     * Comment author
-     */
+    // Reference to comment author
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
 
-    /**
-     * Related article
-     */
+    // Reference to related article
     article: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Article",

@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 
-/**
- * Establishes a connection to the MongoDB database
- * using the MONGO_URI environment variable.
- * 
- * Uses async/await to handle the asynchronous
- * database connection in a non-blocking way.
- */
+// Establish a connection to the MongoDB database.
 const connectDB = async () => {
   try {
 

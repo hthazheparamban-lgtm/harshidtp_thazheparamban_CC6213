@@ -1,41 +1,33 @@
 const express = require("express");
 
-/**
- * Import authentication controller methods
- */
+// Import authentication controller methods
 const {
   registerUser,
   loginUser,
   getCurrentUser
 } = require("../controllers/authController");
 
-/**
- * Import authentication middleware
- */
-const protect = require("../middleware/authMiddleware");
+// Import authentication middleware
+const protect = require(
+  "../middleware/authMiddleware"
+);
 
-/**
- * Import validation middleware
- */
+// Import validation middleware
 const validate = require(
   "../middleware/validationMiddleware"
 );
 
-/**
- * Import request validators
- */
+// Import request validators
 const {
   registerValidation,
   loginValidation
-} = require("../validators/authValidators");
+} = require(
+  "../validators/authValidators"
+);
 
 const router = express.Router();
 
-/**
- * @route POST /api/auth/register
- * @desc Register a new user
- * @access Public
- */
+// Register new user
 router.post(
   "/register",
   registerValidation,
@@ -43,11 +35,7 @@ router.post(
   registerUser
 );
 
-/**
- * @route POST /api/auth/login
- * @desc Login existing user
- * @access Public
- */
+// Login existing user
 router.post(
   "/login",
   loginValidation,
@@ -55,11 +43,7 @@ router.post(
   loginUser
 );
 
-/**
- * @route GET /api/auth/me
- * @desc Get current authenticated user
- * @access Private
- */
+// Get current authenticated user
 router.get(
   "/me",
   protect,

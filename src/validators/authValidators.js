@@ -1,8 +1,6 @@
 const { body } = require("express-validator");
 
-/**
- * Validation rules for user registration
- */
+// Validation rules for user registration
 const registerValidation = [
 
   body("username")
@@ -25,9 +23,7 @@ const registerValidation = [
     )
 ];
 
-/**
- * Validation rules for user login
- */
+// Validation rules for user login
 const loginValidation = [
 
   body("email")

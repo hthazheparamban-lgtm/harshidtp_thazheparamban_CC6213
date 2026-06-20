@@ -9,7 +9,9 @@ A scalable RESTful backend API for a social blogging platform built with Node.js
 - Protected Routes
 - Article CRUD Operations
 - Comment Management System
+- Social Following System
 - Redis Caching
+- Redis Cache Invalidation
 - Redis Pub/Sub Messaging
 - MongoDB Data Persistence
 - RESTful API Design
@@ -39,7 +41,8 @@ src/
 ├── controllers/
 │   ├── authController.js
 │   ├── articleController.js
-│   └── commentController.js
+│   ├── commentController.js
+│   └── profileController.js
 │
 ├── middleware/
 │   ├── authMiddleware.js
@@ -53,7 +56,8 @@ src/
 ├── routes/
 │   ├── authRoutes.js
 │   ├── articleRoutes.js
-│   └── commentRoutes.js
+│   ├── commentRoutes.js
+│   └── profileRoutes.js
 │
 ├── subscribers/
 │   └── articleSubscriber.js
@@ -65,55 +69,40 @@ src/
 └── app.js
 
 server.js
-.env
 package.json
 README.md
 ```
 
 ## Installation
 
-Clone the repository:
-
 ```bash
 git clone <repository-url>
-cd firstname_lastname_CCS6213
-```
+cd Hashid_Thazheparamban_CCS6213
 
-Install dependencies:
-
-```bash
 npm install
 ```
 
 ## Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory.
 
 ```env
 PORT=8000
 
 MONGO_URI=mongodb://127.0.0.1:27017/conduit
 
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_secret_key
 
 REDIS_URL=redis://127.0.0.1:6379
 ```
 
 ## Running the Application
 
-Development:
-
 ```bash
 npm run dev
 ```
 
-Production:
-
-```bash
-npm start
-```
-
-Expected output:
+Expected startup output:
 
 ```text
 MongoDB Connected
@@ -127,27 +116,13 @@ Server running on port 8000
 http://127.0.0.1:8000
 ```
 
-## Authentication
-
-### Register User
+## Authentication Endpoints
 
 ```http
 POST /api/auth/register
-```
-
-### Login User
-
-```http
 POST /api/auth/login
+GET  /api/auth/me
 ```
-
-Protected routes require:
-
-```http
-Authorization: Bearer JWT_TOKEN
-```
-
-Use the token returned from the login endpoint.
 
 ## Article Endpoints
 
@@ -167,9 +142,19 @@ GET    /api/articles/:slug/comments
 DELETE /api/articles/comments/:id
 ```
 
+## Profile Endpoints
+
+```http
+GET    /api/profiles/:id
+POST   /api/profiles/:id/follow
+DELETE /api/profiles/:id/follow
+```
+
 ## Redis Caching
 
-Cached Endpoints:
+The application caches frequently accessed article data.
+
+Cached endpoints:
 
 ```http
 GET /api/articles
@@ -182,12 +167,6 @@ Cache invalidation occurs automatically when:
 - An article is updated
 - An article is deleted
 
-TTL:
-
-```text
-60 seconds
-```
-
 ## Redis Pub/Sub
 
 Channel:
@@ -196,24 +175,19 @@ Channel:
 article-created
 ```
 
-Triggered when:
+Event Trigger:
 
 ```text
-A new article is created
+New article creation
 ```
 
-Example Event:
+Subscriber:
 
 ```text
-ARTICLE CREATED EVENT:
-
-{
-  title: "Redis PubSub Event Test",
-  slug: "redis-pubsub-event-test",
-  author: "...",
-  createdAt: "..."
-}
+articleSubscriber.js
 ```
+
+The subscriber receives article creation events asynchronously and processes them independently of the request lifecycle.
 
 ## Testing
 
@@ -233,10 +207,11 @@ The API can be tested using:
 - RESTful API Design
 - Article CRUD Operations
 - Comment System
+- Social Following System
 - Redis Caching
 - Redis Pub/Sub Messaging
 - Professional Git Workflow
 
 ## Author
 
-CCS6213 Back-end Application Development Assignment
+CCS6213 – Back-end Application Development Assignment - Harshid Thazheparamban

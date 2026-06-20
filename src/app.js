@@ -2,38 +2,40 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+
+// Comment routes
 const commentRoutes = require(
   "./routes/commentRoutes"
 );
 const profileRoutes =
   require("./routes/profileRoutes");
 
-const articleRoutes = require("./routes/articleRoutes");
+// Article routes
+const articleRoutes = require(
+  "./routes/articleRoutes"
+);
 
-/**
- * Import authentication routes
- */
-const authRoutes = require("./routes/authRoutes");
+// Authentication routes
+const authRoutes = require(
+  "./routes/authRoutes"
+);
 
-/**
- * Initialize Express application
- */
+// Create Express application
 const app = express();
 
-/**
- * Middleware Configuration
- */
+// Parse JSON request bodies
 app.use(express.json());
 
+// Enable CORS
 app.use(cors());
 
+// Security headers (disabled during development)
 // app.use(helmet());
 
+// HTTP request logging
 app.use(morgan("dev"));
 
-/**
- * Root route
- */
+// Health check endpoint
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -41,15 +43,13 @@ app.get("/", (req, res) => {
   });
 });
 
-/**
- * Authentication routes
- */
+// Authentication endpoints
 app.use("/api/auth", authRoutes);
 
-/**
- * Article routes
- */
+// Article endpoints
 app.use("/api/articles", articleRoutes);
+ develop
+
 app.use("/api/articles", commentRoutes);
 app.use(
   "/api/profiles",
@@ -58,6 +58,10 @@ app.use(
 /**
  * Export configured Express application
  */
+main
 
+// Comment endpoints
+app.use("/api/articles", commentRoutes);
 
+// Export Express app
 module.exports = app;
